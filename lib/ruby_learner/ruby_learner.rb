@@ -4,6 +4,7 @@ require 'open3'
 require 'ruby_learner/version'
 require 'ruby_learner/common'
 require 'ruby_learner/sequential_check'
+require 'ruby_learner/beginner_check'
 require 'ruby_learner/sequential_check_manual'
 require 'ruby_learner/restore'
 require 'ruby_learner/copspec'
@@ -106,6 +107,32 @@ module RubyLearner
         sequential_check.instruct_modes
       end
     end
+
+    desc 'beginner_check [section:1~11] [part:1~3]','learning drill'
+    map "-b" => "beginner_check"
+    option :next, aliases: :n, type: :boolean
+    option :drill, aliases: :d, type: :boolean
+    option :last, aliases: :l, type: :boolean
+    def beginner_check(*args)
+      begin
+        beginner_check = nil
+        beginner_check = BeginnerCheck.new(@gem_dir, @local_dir)
+
+        if options[:drill]
+          beginner_check.drill_contents
+        elsif options[:next]
+          beginner_check.next_action
+        elsif options[:last]
+          beginner_check.last_re_action
+        else
+          beginner_check.action(args[0], args[1])
+        end
+      rescue => error
+        puts "Error.message: #{error.message}"
+        beginner_check.instruct_modes
+      end
+    end
+
 
     desc 'restore','check your restore'
     map "-r" => "restore"
